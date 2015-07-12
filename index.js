@@ -1,9 +1,20 @@
-// we need session to get access token
-var request = require('request').defaults({
+var request = require('request');
+request = request.defaults({
 	jar: true
 });
 
-module.exports = function(username, password, appId, callback) {
+var access_token = function(username, password, appId, callback) {
+	this.username = username;
+	this.password = password;
+	this.appId = appId;
+
+	// if callback is defined, then login and get access token
+	if (callback) {
+		this.loginGetToken(callback);
+	}
+};
+
+access_token.prototype.login = function(callback) {
 	// login to facebook
 	request.post({
 		url: 'https://www.facebook.com/login.php',
@@ -13,8 +24,8 @@ module.exports = function(username, password, appId, callback) {
 		},
 		form: {
 			lsd: 'AVpVYcLw',
-			email: username,
-			pass: password,
+			email: this.username,
+			pass: this.password,
 			persistent: '1',
 			default_persistent: '0',
 			timezone: '-480',
@@ -29,30 +40,57 @@ module.exports = function(username, password, appId, callback) {
 			return callback(err);
 		}
 
-		// use graph api explorer to get access token
-		request.get({
-			url: 'https://developers.facebook.com/tools/explorer/' + appId + '/permissions?version=v2.1&__a=1&__dyn=5U463-i3S2e4oK4pomXWo5O12wAxu&__req=2&__rev=1470714'
-		}, function(err, res, body) {
+		callback(null);
+	});
+};
+
+access_token.prototype.getToken = function(callback) {
+	// use graph api explorer to get access token
+	request.get({
+		url: 'https://developers.facebook.com/tools/explorer/' + this.appId + '/permissions?version=v2.1&__a=1&__dyn=5U463-i3S2e4oK4pomXWo5O12wAxu&__req=2&__rev=1470714'
+	}, function(err, res, body) {
+		if (err) {
+			return callback(err);
+		}
+
+		if (res.statusCode !== 200) {
+			return callback(new Error('Status code is ' + res.statusCode + ', ' + body));
+		}
+
+		try {
+			body = JSON.parse(body.replace('for (;;);', ''));
+		} catch (e) {
+			return callback(new Error('JSON parse error:' + e));
+		}
+
+		// get token in complicated structure
+		var token;
+		try {
+			token = body.jsmods.instances[2][2][2];
+		} catch (e) {
+			return callback(new Error('No access token'));
+		}
+
+		// return access token
+		callback(null, token);
+	});
+};
+
+access_token.prototype.loginGetToken = function(callback) {
+	var that = this;
+	that.login(function(err) {
+		if (err) {
+			return callback(err);
+		}
+
+		that.getToken(function(err, token) {
 			if (err) {
 				return callback(err);
 			}
 
-			if (res.statusCode !== 200) {
-				return callback(new Error('Status code is ' + res.statusCode + ', ' + body));
-			}
-
-			// remove 'for (;;);' so we can parse it
-			try {
-				body = JSON.parse(body.replace('for (;;);', ''));
-			} catch (e) {
-				return callback(new Error('JSON parse error:', e));
-			}
-
-			// get token in complicated structure
-			var token = body.jsmods.instances[2][2][2];
-
-			// return access token
 			callback(null, token);
 		});
 	});
 };
+
+module.exports = access_token;
