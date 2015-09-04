@@ -1,6 +1,6 @@
 {
     "name": "fb-access-token",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "description": "Retrieve facebook access token by Graph API Explorer API",
     "main": "index.js",
     "dependencies": {
