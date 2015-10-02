@@ -3,15 +3,10 @@ request = request.defaults({
   jar: true
 })
 
-var access_token = function (username, password, appId, callback) {
+var access_token = function (username, password, appId) {
   this.username = username
   this.password = password
   this.appId = appId
-
-  // if callback is defined, then login and get access token
-  if (callback) {
-    this.loginGetToken(callback)
-  }
 }
 
 access_token.prototype.login = function (callback) {
@@ -20,7 +15,7 @@ access_token.prototype.login = function (callback) {
     url: 'https://www.facebook.com/login.php',
     headers: {
       cookie: '_js_datr=o-yfVdmCImbo0AiTO9ir7YVl; _js_reg_fb_ref=https%3A%2F%2Fwww.facebook.com%2F; _js_reg_fb_gate=https%3A%2F%2Fwww.facebook.com%2F; dpr=1.100000023841858',
-      'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.132 Safari/537.36',
+      'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.132 Safari/537.36'
     },
     form: {
       lsd: 'AVpVYcLw',

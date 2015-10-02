@@ -8,30 +8,36 @@ npm install fb-access-token
 ```
 
 ## Usage:
-```javascript
-var fbToken = require('fb-access-token');
 
-// login and get token
-var ft = new fbToken('<USERNAME>', '<PASSWORD>', '<APP_ID>', function(err, token) {
-    if (err) {
-        console.error('Found error!', err);
-        return;
-    }
-    
-    console.log('Access token:', token);
-});
+### Command line:
 
-// get token every second without login again
-setInterval(function() {
-    ft.getToken(function(err, token) {
-        if (err) {
-            console.error('Found error!', err);
-            return;
-        }
-        
-        console.log('Access token:', token);
-    });
-}, 1000);
+```
+fbtoken <USERNAME> <PASSWORD> [APP_ID]
 ```
 
-#### Feel free to open issues and PRs
+### Require It:
+
+```javascript
+var FbToken = require('fb-access-token')
+
+// login and get access token
+// get token for general use by filling 145634995501895 for APP_ID
+var fbToken = new FbToken('USERNAME', 'PASSWORD', 'APP_ID')
+fbToken.loginGetToken(function (err, token) {
+  if (err) throw err
+
+  console.log('Access token:', token)
+})
+
+// get token every second without login again
+setInterval(function () {
+  fbToken.getToken(function (err, token) {
+    if (err) throw err
+
+    console.log('Access token in every second:', token);
+  })
+}, 1000)
+
+```
+
+### Feel free to open issues and PRs
