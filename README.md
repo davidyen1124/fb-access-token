@@ -26,7 +26,7 @@ fbtoken <USERNAME> <PASSWORD> [APP_ID]
 var FbToken = require('fb-access-token')
 
 // login and get access token
-// get token for general use by filling 145634995501895 for APP_ID
+// get token for general use by filling 100008267677115 for APP_ID
 var fbToken = new FbToken('USERNAME', 'PASSWORD', 'APP_ID')
 fbToken.loginGetToken(function (err, token) {
   if (err) throw err
